@@ -1,0 +1,269 @@
+{
+    "alarms": [
+        {
+            "condition": "pm25 > 70",
+            "message": "Bụi PM2.5 vượt ngưỡng: ${pm25} µg/m³",
+            "name": "PM2.5 cao",
+            "severity": "CRITICAL"
+        },
+        {
+            "condition": "gas > 400",
+            "message": "Phát hiện khí gas: ${gas} ppm",
+            "name": "Rò rỉ khí gas",
+            "severity": "CRITICAL"
+        },
+        {
+            "condition": "temperature > 35 OR temperature < 10",
+            "message": "Nhiệt độ: ${temperature}°C",
+            "name": "Nhiệt độ bất thường",
+            "severity": "WARNING"
+        },
+        {
+            "condition": "humidity > 80 OR humidity < 30",
+            "message": "Độ ẩm: ${humidity}%",
+            "name": "Độ ẩm bất thường",
+            "severity": "WARNING"
+        }
+    ],
+    "description": "Hệ thống giám sát môi trường phòng - 8051 + ESP32 + ThingsBoard",
+    "sensors": {
+        "gas": {
+            "alertCondition": "gas > 400",
+            "decimals": 0,
+            "icon": "💨",
+            "max": 1000,
+            "min": 0,
+            "name": "Khí Gas/Khói",
+            "thresholds": [
+                {
+                    "color": "#00E400",
+                    "from": 0,
+                    "label": "An toàn",
+                    "to": 200
+                },
+                {
+                    "color": "#FFFF00",
+                    "from": 200,
+                    "label": "Cảnh báo",
+                    "to": 400
+                },
+                {
+                    "color": "#FF7E00",
+                    "from": 400,
+                    "label": "Nguy hiểm",
+                    "to": 700
+                },
+                {
+                    "color": "#FF0000",
+                    "from": 700,
+                    "label": "Rất nguy hiểm",
+                    "to": 1000
+                }
+            ],
+            "unit": "ppm"
+        },
+        "humidity": {
+            "alertCondition": "humidity > 80 OR humidity < 30",
+            "decimals": 1,
+            "icon": "💧",
+            "max": 100,
+            "min": 0,
+            "name": "Độ ẩm",
+            "thresholds": [
+                {
+                    "color": "#FF7E00",
+                    "from": 0,
+                    "label": "Khô",
+                    "to": 30
+                },
+                {
+                    "color": "#00E400",
+                    "from": 30,
+                    "label": "Thoải mái",
+                    "to": 60
+                },
+                {
+                    "color": "#FFFF00",
+                    "from": 60,
+                    "label": "Ẩm",
+                    "to": 80
+                },
+                {
+                    "color": "#FF0000",
+                    "from": 80,
+                    "label": "Rất ẩm",
+                    "to": 100
+                }
+            ],
+            "unit": "%RH"
+        },
+        "pm25": {
+            "alertCondition": "pm25 > 70",
+            "decimals": 0,
+            "icon": "🌫️",
+            "max": 200,
+            "min": 0,
+            "name": "Bụi mịn PM2.5",
+            "thresholds": [
+                {
+                    "color": "#0000FF",
+                    "from": 0,
+                    "label": "Xuất sắc",
+                    "to": 10
+                },
+                {
+                    "color": "#00E400",
+                    "from": 10,
+                    "label": "Tốt",
+                    "to": 25
+                },
+                {
+                    "color": "#FFFF00",
+                    "from": 25,
+                    "label": "Trung bình",
+                    "to": 50
+                },
+                {
+                    "color": "#FF7E00",
+                    "from": 50,
+                    "label": "Kém",
+                    "to": 70
+                },
+                {
+                    "color": "#FF0000",
+                    "from": 70,
+                    "label": "Xấu",
+                    "to": 150
+                },
+                {
+                    "color": "#8F3F97",
+                    "from": 150,
+                    "label": "Nguy hại",
+                    "to": 200
+                }
+            ],
+            "unit": "µg/m³"
+        },
+        "temperature": {
+            "alertCondition": "temperature > 35 OR temperature < 10",
+            "decimals": 1,
+            "icon": "🌡️",
+            "max": 50,
+            "min": 0,
+            "name": "Nhiệt độ",
+            "thresholds": [
+                {
+                    "color": "#0000FF",
+                    "from": 0,
+                    "label": "Lạnh",
+                    "to": 10
+                },
+                {
+                    "color": "#00E400",
+                    "from": 10,
+                    "label": "Mát",
+                    "to": 18
+                },
+                {
+                    "color": "#FFFF00",
+                    "from": 18,
+                    "label": "Bình thường",
+                    "to": 28
+                },
+                {
+                    "color": "#FF7E00",
+                    "from": 28,
+                    "label": "Nóng",
+                    "to": 35
+                },
+                {
+                    "color": "#FF0000",
+                    "from": 35,
+                    "label": "Rất nóng",
+                    "to": 50
+                }
+            ],
+            "unit": "°C"
+        }
+    },
+    "setupGuide": {
+        "step1": "Tạo Dashboard mới: Dashboards > + > Tên: Smart Room Monitor",
+        "step2": "Mở Dashboard > Edit mode",
+        "step3": "Add 4 Value Cards cho temperature, humidity, pm25, gas",
+        "step4": "Add 2 Value Cards cho airQualityStatus, gasStatus",
+        "step5": "Add Timeseries chart cho temperature, humidity, pm25",
+        "step6": "Sắp xếp layout theo mô tả",
+        "step7": "Save Dashboard"
+    },
+    "telemetryKeys": [
+        "temperature",
+        "humidity",
+        "pm25",
+        "gas",
+        "airQualityStatus",
+        "airQualityLevel",
+        "airQualityColor",
+        "gasStatus",
+        "gasColor",
+        "pm25Alert",
+        "gasAlert",
+        "tempAlert",
+        "humidAlert"
+    ],
+    "title": "Smart Room Monitor",
+    "widgets": {
+        "row1_cards": {
+            "description": "4 Value Cards hiển thị giá trị hiện tại",
+            "items": [
+                {
+                    "key": "temperature",
+                    "label": "🌡️ Nhiệt độ",
+                    "unit": "°C"
+                },
+                {
+                    "key": "humidity",
+                    "label": "💧 Độ ẩm",
+                    "unit": "%"
+                },
+                {
+                    "key": "pm25",
+                    "label": "🌫️ PM2.5",
+                    "unit": "µg/m³"
+                },
+                {
+                    "key": "gas",
+                    "label": "💨 Gas",
+                    "unit": "ppm"
+                }
+            ],
+            "layout": "4 cards ngang hàng, mỗi card 1/4 width",
+            "type": "Cards > Value card"
+        },
+        "row2_status": {
+            "description": "2 Status Cards hiển thị trạng thái",
+            "items": [
+                {
+                    "key": "airQualityStatus",
+                    "label": "🏠 Chất lượng không khí"
+                },
+                {
+                    "key": "gasStatus",
+                    "label": "⚠️ Trạng thái khí gas"
+                }
+            ],
+            "layout": "2 cards ngang hàng, mỗi card 1/2 width",
+            "type": "Cards > Value card"
+        },
+        "row3_chart": {
+            "description": "Biểu đồ lịch sử",
+            "keys": [
+                "temperature",
+                "humidity",
+                "pm25"
+            ],
+            "layout": "Full width",
+            "timeWindow": "1 hour realtime",
+            "type": "Charts > Timeseries - Flot"
+        }
+    }
+}

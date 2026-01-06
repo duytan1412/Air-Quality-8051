@@ -1,0 +1,19 @@
+# Keil uVision build files
+*.uvgui.*
+*.uvopt
+*.bak
+*.dep
+*.d
+*.o
+*.axf
+*.htm
+*.lnp
+*.lst
+*.map
+*.crf
+*.i
+Objects/
+Listings/
+RTE/
+*.scvd
+DebugConfig/
