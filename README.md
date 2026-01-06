@@ -47,8 +47,10 @@ Air-Quality-8051/
 
 ## 👨‍💻 Tác giả
 
+**Bì Duy Tân**
 - Sinh viên FPT Jetking - Kỳ 1
 
 ## 📝 License
 
 MIT License - Tự do sử dụng cho mục đích học tập
+
