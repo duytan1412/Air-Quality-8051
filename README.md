@@ -1,9 +1,10 @@
-# 🌱 Air Quality Monitoring System (8051)
+# 🌱 Air Quality Monitoring System (8051 & ESP32)
 
-**IoT Environmental Monitoring with 8051 Microcontroller**
+**Advanced IoT Environmental Monitoring with Layered Firmware Architecture**
 
 ![8051](https://img.shields.io/badge/MCU-8051-green)
 ![Keil](https://img.shields.io/badge/IDE-Keil%20uVision%205-orange)
+![ESP32](https://img.shields.io/badge/SoC-ESP32-blue)
 ![FPT Jetking](https://img.shields.io/badge/FPT%20Jetking-Featured%20Project-blue)
 
 ---
@@ -11,112 +12,72 @@
 ## 📋 Description | Mô tả
 
 **🇬🇧 English:**  
-A real-time **IoT Air Quality Monitoring System** using 8051 microcontroller. This project demonstrates embedded firmware development skills including register-level programming, interrupt handling, and multi-MCU communication via UART.
-
-> 🏆 **Featured Project** on [FPT Jetking Official Fanpage](https://www.facebook.com/share/p/17SBQQEq5k/)
+A complex **IoT System** for real-time monitoring of PM2.5, Gas, Temperature, and Humidity. This project showcases a professional **Layered Architecture** (Drivers -> Core -> Application) on a resource-constrained 8051 MCU, with data bridging to **ThingsBoard Cloud** via ESP32.
 
 **🇻🇳 Tiếng Việt:**  
-Hệ thống **Giám sát Chất lượng Không khí IoT** thời gian thực sử dụng vi điều khiển 8051. Dự án thể hiện kỹ năng phát triển firmware nhúng bao gồm lập trình cấp thanh ghi, xử lý ngắt và giao tiếp đa vi điều khiển qua UART.
-
-> 🏆 **Dự án tiêu biểu** được đăng trên [Fanpage chính thức FPT Jetking](https://www.facebook.com/share/p/17SBQQEq5k/)
+Hệ thống **IoT phức hợp** giám sát thời gian thực bụi mịn PM2.5, Khí gas, Nhiệt độ và Độ ẩm. Dự án thể hiện **Kiến trúc phân lớp chuyên nghiệp** (Drivers -> Core -> Application) trên vi điều khiển 8051 hạn chế tài nguyên, kết nối dữ liệu lên **ThingsBoard Cloud** thông qua ESP32.
 
 ---
 
-## ✨ Key Features | Tính năng chính
+## 🛠️ Hardware Deep Dive | Chi tiết phần cứng
 
-| Feature | Description | Mô tả |
-|---------|-------------|-------|
-| **Real-time Monitoring** | Continuous air quality measurement | Đo chất lượng không khí liên tục |
-| **LCD Display** | Visual data output on screen | Hiển thị dữ liệu trực quan trên màn hình |
-| **Auto Alert** | Warning when threshold exceeded | Cảnh báo khi vượt ngưỡng cho phép |
-| **Low Power** | Optimized for 24/7 operation | Tối ưu hoạt động 24/7 |
-
----
-
-## 🛠️ Technology Stack | Công nghệ sử dụng
-
-| Component | Details | Chi tiết |
-|-----------|---------|----------|
-| **MCU** | 8051 Microcontroller | Vi điều khiển 8051 |
-| **IDE** | Keil uVision 5 | Keil uVision 5 |
-| **Language** | Embedded C / Assembly | C nhúng / Assembly |
-| **Communication** | UART (8051 ↔ ESP32) | UART (8051 ↔ ESP32) |
-| **Sensors** | Air quality sensors | Cảm biến chất lượng không khí |
+| Component | Technical Details | Role |
+|-----------|------------------|------|
+| **ADS1115** | 16-bit High Precision ADC via I2C | High-res data for Analog sensors |
+| **GP2Y1014** | Optical Dust Sensor (PM2.5) | Dust density measurement |
+| **MQ-2** | Gas/Smoke Sensor | Air quality & Safety alert |
+| **AHT10** | Digital Temp & Humid (I2C) | Precise environment sensing |
+| **LCD 16x2** | Parallel interface (8-bit) | Local UI monitoring |
+| **ESP32** | SoC with Wi-Fi | Gateway to ThingsBoard Cloud |
 
 ---
 
-## 🔧 Technical Highlights | Điểm kỹ thuật nổi bật
+## 🔧 Software Architecture | Kiến trúc phần mềm
+
+### 📁 1. Drivers Layer (`drivers/`)
+- **`i2c.c/h`**: Software I2C implementation for ADS1115 and AHT10.
+- **`ads1115.c/h`**: 16-bit ADC driver handling gain and conversion.
+- **`lcd.c/h`**: Driver for character LCD 16x2.
+- **`mq2.c/h` & `gp2y1014.c/h`**: Sensor signal processing & calibration.
+
+### 📁 2. Core Layer (`core/`)
+- **`uart_protocol.c/h`**: Custom communication protocol between 8051 and ESP32.
+- **`watchdog.c/h`**: System reliability and auto-recovery.
+- **`display.c/h`**: High-level UI management for the LCD.
+
+### 📁 3. Cloud Integration (`esp32_thingsboard/`)
+- ESP32 acts as a **smart gateway**, receiving UART packets from 8051, parsing them into JSON, and publishing to **ThingsBoard** via MQTT.
+
+---
+
+## 📡 UART Communication Protocol | Giao thức truyền thông
+
+**Packet Format:** `[START] [PM2.5] [GAS] [TEMP] [HUMID] [CHECKSUM] [END]`
+- **Baudrate:** 9600 bps
+- **Sync:** Asynchronous interrupt-based reception on 8051.
+
+---
+
+## 🏆 Technical Highlights | Điểm nhấn kỹ thuật
 
 **🇬🇧 English:**
-- **Register-level programming** - Direct manipulation of 8051 SFRs (Special Function Registers)
-- **Interrupt handling** - Timer and UART interrupts for responsive system
-- **UART communication** - Asynchronous data transfer between 8051 and ESP32
-- **Memory optimization** - Efficient code for limited 8051 resources (128 bytes RAM)
+- **Layered Design:** Decoupling hardware drivers from business logic for portability.
+- **Interrupt Management:** Critical for handling real-time sensor sampling and UART tasks.
+- **Resource Optimization:** Running a complex system on 128 bytes of DATA RAM.
+- **Cloud Connectivity:** Real-time data visualization on a professional IoT Dashboard.
 
 **🇻🇳 Tiếng Việt:**
-- **Lập trình cấp thanh ghi** - Thao tác trực tiếp với SFRs của 8051
-- **Xử lý ngắt** - Ngắt Timer và UART cho hệ thống đáp ứng nhanh
-- **Giao tiếp UART** - Truyền dữ liệu bất đồng bộ giữa 8051 và ESP32
-- **Tối ưu bộ nhớ** - Code hiệu quả cho tài nguyên hạn chế của 8051 (128 bytes RAM)
-
----
-
-## 📁 Project Structure | Cấu trúc dự án
-
-```
-Air-Quality-8051/
-├── main.c              # Main program / Chương trình chính
-├── *.uvproj            # Keil project file
-├── README.md           # This file
-├── .gitignore          # Ignore build files
-└── ...
-```
-
----
-
-## 🚀 How to Run | Cách chạy
-
-**🇬🇧 English:**
-1. Open Keil uVision 5
-2. Open project file (`.uvproj`)
-3. Build project (F7)
-4. Flash to 8051 board
-
-**🇻🇳 Tiếng Việt:**
-1. Mở Keil uVision 5
-2. Mở file project (`.uvproj`)
-3. Build project (F7)
-4. Nạp vào board 8051
-
----
-
-## 🎓 What I Learned | Những gì tôi học được
-
-**🇬🇧 English:**
-- Low-level embedded programming on resource-constrained MCU
-- Hardware debugging and timing analysis
-- Multi-MCU system design with UART protocol
-- Sensor data processing and calibration
-
-**🇻🇳 Tiếng Việt:**
-- Lập trình nhúng cấp thấp trên MCU tài nguyên hạn chế
-- Debug phần cứng và phân tích timing
-- Thiết kế hệ thống đa MCU với giao thức UART
-- Xử lý và hiệu chỉnh dữ liệu cảm biến
+- **Thiết kế phân lớp:** Tách rời driver phần cứng khỏi logic nghiệp vụ giúp dễ bảo trì và mở rộng.
+- **Quản lý ngắt:** Rất quan trọng để xử lý việc lấy mẫu cảm biến và truyền UART thời gian thực.
+- **Tối ưu hóa tài nguyên:** Chạy một hệ thống phức tạp chỉ với 128 bytes RAM.
+- **Kết nối Cloud:** Trực quan hóa dữ liệu thời gian thực trên Dashboard IoT chuyên nghiệp.
 
 ---
 
 ## 👨‍💻 Author | Tác giả
 
 **Bì Duy Tân**
-- 🎓 FPT Jetking - Chip Design Technology (Semester 1)
-- 🎯 Target: Embedded Tester @ FPT Software Automotive  
+- 🎓 FPT Jetking (Featured Student Project)
+- 🎯 Embedded Firmware / IoT Developer
 - 📧 duytan2903@gmail.com
-- 🔗 [LinkedIn](https://www.linkedin.com/in/duy-t%C3%A2n-b-439ba0153/)
-- 💻 [GitHub](https://github.com/duytan1412)
-
----
-
-## 📝 License
-
-MIT License - Free to use for learning purposes.
+- 🔗 [Featured on FPT Jetking Page](https://www.facebook.com/share/p/17SBQQEq5k/)
