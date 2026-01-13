@@ -69,10 +69,11 @@ flowchart LR
     UART_RX --> WIFI
     WIFI --> CLOUD
     
-    style MCU fill:#e1f5ff,stroke:#3498db,stroke-width:3px
-    style Gateway fill:#e8ffe1,stroke:#27ae60,stroke-width:3px
-    style ADC fill:#fff4e1,stroke:#f39c12,stroke-width:2px
-    style Sensors fill:#fde2e4,stroke:#e74c3c,stroke-width:2px
+    style MCU fill:#e1f5ff,stroke:#3498db,stroke-width:3px,color:#000
+    style Gateway fill:#e8ffe1,stroke:#27ae60,stroke-width:3px,color:#000
+    style ADC fill:#fff4e1,stroke:#f39c12,stroke-width:2px,color:#000
+    style Sensors fill:#fde2e4,stroke:#e74c3c,stroke-width:2px,color:#000
+    style Display fill:#f0f0f0,stroke:#7f8c8d,stroke-width:2px,color:#000
 ```
 
 **Signal Flow Explanation:**
@@ -275,7 +276,7 @@ void uart_send(unsigned char c) {
 - 🎓 FPT Jetking (Chip Design Technology) - **Electronics: 96/100, Digital Logic: 93/100**
 - 🎯 Embedded Firmware Engineer @ FPT Semiconductor (Target)
 - 📧 duytan2903@gmail.com
-- 🔗 [LinkedIn](https://www.linkedin.com/in/duy-t%C3%A2n-b-439ba0153/)
+- 🔗 [LinkedIn](https://www.linkedin.com/in/bi-duy-tan-)
 - 💻 [GitHub](https://github.com/duytan1412)
 
 ---
