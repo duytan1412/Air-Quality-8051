@@ -101,6 +101,28 @@ flowchart LR
 
 ---
 
+## 📸 Evidence & Verification | Minh chứng & Kiểm thử
+
+### 1. Hardware Schematic (Proteus Simulation)
+![Schematic Diagram](./docs/schematic.png)
+*Full system schematic including 8051 MCU, ADC0804 interface, and sensor connections.*
+
+### 2. Live Demo Video
+[![Watch the video](https://img.youtube.com/vi/placeholder/0.jpg)](https://youtu.be/placeholder)
+*Click to watch the system in action: Sensor readings, LCD updates, and Cloud data transmission.*
+
+### 3. Sample UART Log (Termite/Putty)
+Real-time data packets sent to ESP32 Gateway:
+```text
+[START] PM2.5: 35ug/m3 | GAS: 120ppm | TEMP: 28.5C | HUMID: 65% [CHECKSUM_OK]
+[START] PM2.5: 36ug/m3 | GAS: 122ppm | TEMP: 28.5C | HUMID: 65% [CHECKSUM_OK]
+[START] PM2.5: 34ug/m3 | GAS: 118ppm | TEMP: 28.6C | HUMID: 64% [CHECKSUM_OK]
+...
+[ALERT] GAS LEVEL CRITICAL! TRIGGERING BUZZER...
+```
+
+---
+
 ## 🛠️ Hardware Components | Thành phần phần cứng
 
 | Component | Technical Details | Role |
