@@ -20,7 +20,7 @@ A complex **IoT System** for real-time monitoring of PM2.5, Gas, Temperature, an
 **🇻🇳 Tiếng Việt:**  
 Hệ thống **IoT phức hợp** giám sát thời gian thực bụi mịn PM2.5, Khí gas, Nhiệt độ và Độ ẩm. Dự án thể hiện **Kiến trúc phân lớp chuyên nghiệp** (Drivers -> Core -> Application) trên vi điều khiển 8051 hạn chế tài nguyên, kết nối dữ liệu lên **ThingsBoard Cloud** thông qua ESP32.
 
-> 🏆 **Dự án tiêu biểu** được đăng trên [Website chính thức FPT Jetking](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/?gidzl=ioqpITI0dKAnDpDErfQUJR4xC47EcyiOhpHWGPlFnqt_PM54dSYTIFbaOqEToieT-sHbH31HcPyxq8MPHW) và [Fanpage Facebook](https://www.facebook.com/share/p/17SBQQEq5k/)
+> 🏆 **Dự án tiêu biểu** được đăng trên [Website chính thức FPT Jetking](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/) và [Fanpage Facebook](https://www.facebook.com/share/p/17SBQQEq5k/)
 
 ---
 
@@ -108,8 +108,13 @@ flowchart LR
 *Full system schematic including 8051 MCU, ADC0804 interface, and sensor connections.*
 
 ### 2. Live Demo Video
-[![Watch the video](https://img.youtube.com/vi/placeholder/0.jpg)](https://youtu.be/placeholder)
-*Click to watch the system in action: Sensor readings, LCD updates, and Cloud data transmission.*
+> **🎥 [Watch Video Demo](./docs/8051_Demo.mp4)** (Click to download/view raw file)
+
+*Click to verify system operation: Sensor readings, LCD updates, and Cloud data transmission.*
+
+### 3. Media Coverage
+> 📰 **Featured Article:** [Student FPT Jetking Designs Green Living Solution](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/)
+
 
 ### 3. Sample UART Log (Termite/Putty)
 Real-time data packets sent to ESP32 Gateway:
