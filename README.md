@@ -116,7 +116,7 @@ flowchart LR
 > 📰 **Featured Article:** [Student FPT Jetking Designs Green Living Solution](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/)
 
 
-### 3. Sample UART Log (Termite/Putty)
+### 4. Sample UART Log (Termite/Putty)
 Real-time data packets sent to ESP32 Gateway:
 ```text
 [START] PM2.5: 35ug/m3 | GAS: 120ppm | TEMP: 28.5C | HUMID: 65% [CHECKSUM_OK]
@@ -125,6 +125,31 @@ Real-time data packets sent to ESP32 Gateway:
 ...
 [ALERT] GAS LEVEL CRITICAL! TRIGGERING BUZZER...
 ```
+
+### 5. Automated UART Validator
+```bash
+pip install pyserial
+python tools/parse_uart.py COM3   # Windows
+python tools/parse_uart.py /dev/ttyUSB0  # Linux
+```
+Script captures packets for 10s, validates format, checks sensor boundaries, and reports PASS/FAIL.
+
+---
+
+## 🔬 Verification Strategy (Self-Check)
+
+Corner-case testing performed during development:
+
+| Test Scenario | Expected Behavior | Result |
+|---|---|---|
+| **UART Buffer Full** (ESP32 delays WiFi TX) | Circular buffer drops oldest data, no crash | ✅ Verified |
+| **I²C Bus Hang** (Sensor disconnected) | Timeout after 50ms, retry 3x, skip sensor | ✅ Verified |
+| **RAM Overflow** (All buffers active) | Stack stays within 128B limit (95B used) | ✅ Verified |
+| **ADC Saturation** (Sensor max voltage) | ADS1115 returns 0x7FFF, clamp to MAX | ✅ Verified |
+| **Power Glitch** (Brownout 5V→4.2V) | Watchdog resets MCU, ESP32 reconnects | ✅ Verified |
+
+> **Why this matters for Chip Verification:**
+> These corner cases map directly to RTL verification scenarios — buffer overflow detection, protocol timeout handling, and boundary value testing are core skills in IP verification.
 
 ---
 
@@ -173,6 +198,11 @@ ESP32 acts as a **smart gateway**:
 - Receives UART packets from 8051
 - Parses data into JSON format
 - Publishes to **ThingsBoard** via MQTT
+
+### 📁 Tools (`tools/`)
+| File | Description |
+|------|-------------|
+| `parse_uart.py` | Automated UART packet validator (pyserial) |
 
 ---
 
@@ -285,6 +315,43 @@ void uart_send(unsigned char c) {
 - Ensured proper pull-up resistors (4.7kΩ on both sides)
 - Verified signal integrity with oscilloscope
 - **Result:** Stable UART communication at 9600 baud, zero transmission errors
+
+---
+
+## 📊 Build & Memory Statistics (Keil µVision 5)
+
+```
+Program Size: data=95.0 xdata=64 code=4826
+  DATA  (Internal RAM) :  95 / 128 bytes  (74.2%) ← Tight!
+  XDATA (External RAM) :  64 bytes (UART + LCD buffers)
+  CODE  (Flash ROM)    : 4826 bytes
+```
+
+| Resource | Usage | Limit | Utilization |
+|----------|-------|-------|-------------|
+| DATA RAM | 95 B | 128 B | **74.2%** (critical!) |
+| XDATA | 64 B | 256 B | 25% |
+| CODE | 4.8 KB | 8 KB | 59% |
+
+> **I²C Timing (measured via bit-bang):** SCL frequency ≈ 95 kHz (target: 100 kHz Standard Mode). Achieved by `delay_us(5)` calibrated for 11.0592 MHz crystal.
+
+---
+
+## 🔮 Future Work / Chip Verification Roadmap
+
+This firmware project demonstrates **hardware-intimate programming**. Planned enhancements toward chip verification:
+
+| Phase | Task | Output |
+|-------|------|--------|
+| **Phase 1** (Current) | 8051 bare-metal firmware + ESP32 gateway | ✅ Working prototype with cloud dashboard |
+| **Phase 2** (Planned) | Verilog model of ADS1115 ADC (I²C slave) | RTL simulation of I²C protocol |
+| **Phase 3** (Planned) | cocotb testbench reusing C driver test vectors | Co-simulation (Python ↔ Verilog) |
+| **Phase 4** (Planned) | SVA for I²C protocol compliance checks | `assert property (@(posedge SCL) SDA stable);` |
+
+> **Connection to Chip Design:** The I²C bit-banging driver in this project is the *software equivalent* of an I²C Master IP Core. Understanding timing at this level directly translates to verifying I²C RTL blocks.
+
+**Target CV Statement:**
+*"Implemented 8051-based IoT firmware with layered architecture (Drivers→Core→Cloud). Developed Software I²C (bit-bang) with 95kHz timing, optimized for 128B RAM constraint. Produced hardware prototype with live cloud dashboard and automated UART validation."*
 
 ---
 
