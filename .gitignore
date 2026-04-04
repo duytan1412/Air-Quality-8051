@@ -1,3 +1,17 @@
+# AI Tool Configuration (moved to d:\Project_AI_Backup\)
+.agent/
+.claude/
+.knowns/
+.kiro/
+.mcp.json
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Junk files
+database.db
+~WRL*.tmp
+
 # Keil uVision build files
 *.uvgui.*
 *.uvopt

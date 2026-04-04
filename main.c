@@ -24,7 +24,7 @@ unsigned char err_aht10 = 0;
 unsigned char err_pm25 = 0;
 unsigned char err_gas = 0;
 
-// Bộ lọc trung bình cho Gas (loại bỏ spike nhiễu)
+// Moving average filter buffer for Gas sensor (removes noise spikes)
 #define GAS_FILTER_SIZE 4
 unsigned int gas_history[GAS_FILTER_SIZE] = {0, 0, 0, 0};
 unsigned char gas_index = 0;
@@ -43,26 +43,22 @@ void INT0_ISR(void) interrupt 0
 #define GAS_RAW_MAX 32000
 #define MQ2_ZERO_THRESHOLD 150
 
-// Hàm lọc trung bình - loại bỏ giá trị spike
+// Trimmed average filter: Removes min/max values to eliminate spikes
 unsigned int Gas_Filter(unsigned int new_value)
 {
     unsigned long sum = 0;
     unsigned char i;
     unsigned int max_val = 0, min_val = 65535;
     
-    // Lưu giá trị mới vào mảng
     gas_history[gas_index] = new_value;
     gas_index = (gas_index + 1) % GAS_FILTER_SIZE;
     
-    // Tìm max và min
     for (i = 0; i < GAS_FILTER_SIZE; i++) {
         if (gas_history[i] > max_val) max_val = gas_history[i];
         if (gas_history[i] < min_val) min_val = gas_history[i];
         sum += gas_history[i];
     }
     
-    // Loại bỏ max và min, tính trung bình 2 giá trị còn lại
-    // Đây là "Trimmed Mean" - loại bỏ outlier
     sum = sum - max_val - min_val;
     return (unsigned int)(sum / (GAS_FILTER_SIZE - 2));
 }
@@ -114,7 +110,7 @@ void main(void)
 
         if (gas_raw > 32767) gas_raw = 32767;
         
-        // Áp dụng bộ lọc trước khi tính ppm
+        // Apply filter before converting to ppm
         gas_raw = Gas_Filter(gas_raw);
         
         if (gas_raw > MQ2_ZERO_THRESHOLD)

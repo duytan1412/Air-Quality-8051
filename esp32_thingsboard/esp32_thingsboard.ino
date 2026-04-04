@@ -180,11 +180,7 @@ void TB_SendTelemetry(float temp, float humid, float pm, unsigned int g)
     tb.sendTelemetryData("sensorError_PM25", err_pm25);
     tb.sendTelemetryData("sensorError_Gas", err_gas);
     
-    Serial.println("[TB] Telemetry sent!");
-    Serial.printf("  T=%.1f H=%.1f PM=%.0f G=%u ppm\n", temp, humid, pm, g);
-    if (err_aht10 || err_pm25 || err_gas) {
-        Serial.printf("  [SENSOR ERRORS: T/H=%d PM=%d Gas=%d]\n", err_aht10, err_pm25, err_gas);
-    }
+    Serial.printf("[TB] TX: T=%.1f H=%.1f PM=%.0f G=%u\n", temp, humid, pm, g);
 }
 
 bool ProcessUARTChar(char c)
@@ -210,11 +206,8 @@ bool ProcessUARTChar(char c)
                 err_pm25 = (err & 2) ? true : false;
                 err_gas = (err & 4) ? true : false;
 
-                Serial.printf("Data: T=%.1f H=%.1f PM=%.0f G=%u", 
-                              temperature, humidity, pm25, gas);
-                if (err > 0) {
-                    Serial.printf(" [ERR=%d: T=%d P=%d G=%d]", err, err_aht10, err_pm25, err_gas);
-                }
+                Serial.printf("UART RX: %.1f, %.1f, %.0f, %u", temperature, humidity, pm25, gas);
+                if (err > 0) Serial.printf(" E:%d", err);
                 Serial.println();
                 uartBufferIndex = 0;
                 return true;
@@ -246,9 +239,7 @@ void setup()
     
     delay(500);
     
-    Serial.println("\n========================================");
-    Serial.println("  ESP32-S2 MINI SENSOR MONITOR");
-    Serial.println("========================================");
+    Serial.println("\nInitializing S2 Mini Gateway...");
 
     Serial1.begin(9600, SERIAL_8N1, 9, 8);
     Serial.println("[INFO] UART: GPIO9=RX, GPIO8=TX");
@@ -293,15 +284,6 @@ void loop()
         if (tb.connected()) {
             TB_SendTelemetry(temperature, humidity, pm25, gas);
         }
-        
-        Serial.println("=== SENSOR DATA ===");
-        Serial.printf("Temperature: %.1f C\n", temperature);
-        Serial.printf("Humidity: %.1f %%\n", humidity);
-        Serial.printf("PM2.5: %.0f ug/m3\n", pm25);
-        Serial.printf("Gas: %u ppm\n", gas);
-        Serial.printf("Air Quality: %s\n", AirQuality_GetStatus(pm25).c_str());
-        Serial.println("==================");
-        
         dataReady = false;
     }
     

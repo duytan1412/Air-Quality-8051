@@ -1,380 +1,88 @@
-# 🌱 Air Quality Monitoring System (8051 & ESP32)
+# Air Quality Monitoring System
 
-**Advanced IoT Environmental Monitoring with Layered Firmware Architecture**
+A firmware project that implements environmental monitoring using an 8051 microcontroller as the primary processing unit and an ESP32 as an IoT gateway.
 
-![8051](https://img.shields.io/badge/MCU-8051-green)
-![Keil](https://img.shields.io/badge/IDE-Keil%20uVision%205-orange)
-![ESP32](https://img.shields.io/badge/SoC-ESP32-blue)
-![Build](https://img.shields.io/badge/Build-Passing-success)
-![FPT Jetking](https://img.shields.io/badge/FPT%20Jetking-Featured%20Project-blue)
+The system gathers data from multiple analog and digital sensors, processes it under severe memory constraints (128B RAM), and formats it into UART packets. The ESP32 parses these packets and forwards them to a ThingsBoard cloud dashboard via MQTT.
 
----
-
-## 📋 Description | Mô tả
-
-**🇬🇧 English:**  
-A complex **IoT System** for real-time monitoring of PM2.5, Gas, Temperature, and Humidity. This project showcases a professional **Layered Architecture** (Drivers -> Core -> Application) on a resource-constrained 8051 MCU, with data bridging to **ThingsBoard Cloud** via ESP32.
-
-> 🏆 **Featured Project** on [FPT Jetking Official Website](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/?gidzl=ioqpITI0dKAnDpDErfQUJR4xC47EcyiOhpHWGPlFnqt_PM54dSYTIFbaOqEToieT-sHbH31HcPyxq8MPHW) and [Facebook Fanpage](https://www.facebook.com/share/p/17SBQQEq5k/)
-
-**🇻🇳 Tiếng Việt:**  
-Hệ thống **IoT phức hợp** giám sát thời gian thực bụi mịn PM2.5, Khí gas, Nhiệt độ và Độ ẩm. Dự án thể hiện **Kiến trúc phân lớp chuyên nghiệp** (Drivers -> Core -> Application) trên vi điều khiển 8051 hạn chế tài nguyên, kết nối dữ liệu lên **ThingsBoard Cloud** thông qua ESP32.
-
-> 🏆 **Dự án tiêu biểu** được đăng trên [Website chính thức FPT Jetking](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/) và [Fanpage Facebook](https://www.facebook.com/share/p/17SBQQEq5k/)
-
----
-
-## 📐 System Block Diagram | Sơ đồ khối hệ thống
-
-The system implements a **master-slave architecture** with 8051 as the firmware master and ESP32 as the cloud gateway.
+## Architecture
 
 ```mermaid
 flowchart LR
-    subgraph Sensors["📡 Sensor Layer"]
-        MQ2[MQ-2<br/>Gas Sensor<br/>Analog]
-        DUST[GP2Y1014<br/>Dust PM2.5<br/>Analog]
-        AHT[AHT10<br/>Temp/Humid<br/>I2C]
+    subgraph Sensors["Sensors"]
+        MQ2[MQ-2 Gas]
+        DUST[GP2Y1014 Dust]
+        AHT[AHT10 Temp/Humid]
     end
     
-    subgraph ADC["🔌 ADC Module"]
-        ADS[ADS1115<br/>16-bit ADC<br/>I2C 0x48]
+    subgraph ADC["ADC Module"]
+        ADS[ADS1115 I2C]
     end
     
-    subgraph MCU["💻 8051 Microcontroller<br/>(Firmware Master)"]
-        I2C_DRV[I2C Driver<br/>Software Bitbang]
-        CORE[Core Processing<br/>• Data filtering<br/>• Packet building]
-        UART_TX[UART TX<br/>9600 baud]
+    subgraph MCU["8051 MCU (Master)"]
+        I2C_DRV["I2C Driver (Bitbang)"]
+        CORE["Data Processing"]
+        UART_TX["UART TX"]
     end
     
-    subgraph Display["🖥️ Local Display"]
-        LCD[LCD 16x2<br/>Parallel 8-bit]
+    subgraph Display["Local UI"]
+        LCD["LCD 16x2"]
     end
     
-    subgraph Gateway["🌐 ESP32 Gateway"]
-        UART_RX[UART RX<br/>Packet Parser]
-        WIFI[WiFi Module<br/>JSON → MQTT]
-        CLOUD[ThingsBoard<br/>Cloud Dashboard]
+    subgraph Gateway["ESP32 Gateway"]
+        UART_RX["UART RX"]
+        CLOUD["ThingsBoard MQTT"]
     end
     
-    MQ2 -->|Analog Signal| ADS
-    DUST -->|Analog Signal| ADS
-    AHT -->|I2C 400kHz| I2C_DRV
-    ADS -->|I2C 400kHz| I2C_DRV
+    MQ2 --> ADS
+    DUST --> ADS
+    AHT --> I2C_DRV
+    ADS --> I2C_DRV
     
     I2C_DRV --> CORE
     CORE --> LCD
     CORE --> UART_TX
     
-    UART_TX -->|TX/RX<br/>Level Shifted<br/>5V↔3.3V| UART_RX
-    UART_RX --> WIFI
-    WIFI --> CLOUD
-    
-    style MCU fill:#e1f5ff,stroke:#3498db,stroke-width:3px,color:#000
-    style Gateway fill:#e8ffe1,stroke:#27ae60,stroke-width:3px,color:#000
-    style ADC fill:#fff4e1,stroke:#f39c12,stroke-width:2px,color:#000
-    style Sensors fill:#fde2e4,stroke:#e74c3c,stroke-width:2px,color:#000
-    style Display fill:#f0f0f0,stroke:#7f8c8d,stroke-width:2px,color:#000
+    UART_TX --> UART_RX
+    UART_RX --> CLOUD
 ```
 
-**Signal Flow Explanation:**
-1. **Analog sensors** (MQ-2, GP2Y1014) → ADS1115 ADC → I2C bus
-2. **Digital sensor** (AHT10) → Direct I2C communication
-3. **8051 firmware** polls sensors via I2C, processes data
-4. **UART master-slave** protocol sends packets to ESP32
-5. **ESP32** converts to JSON and publishes to ThingsBoard via MQTT
+## System Components
 
----
+- **MCU**: AT89C51 (8051 architecture)
+- **Gateway**: ESP32-S2 Mini
+- **Sensors**: 
+  - AHT10 (I2C Digital Temperature & Humidity)
+  - GP2Y1014 (Analog PM2.5 Optical Dust Sensor)
+  - MQ-2 (Analog Gas/Smoke Sensor)
+- **ADC**: ADS1115 (16-bit, 4-channel, I2C)
+- **Display**: LCD 16x2 (Parallel 8-bit interface)
 
-## 🔧 Hardware Implementation | Triển khai phần cứng
+## Firmware Structure
 
-![Circuit Board - Real Hardware](https://github.com/duytan1412/Air-Quality-8051/blob/main/docs/circuit_board.jpg?raw=true)
-*Real hardware implementation: 8051 MCU on breadboard with ESP32, sensors, ADC module, and logic level shifters*
+The 8051 firmware is written in C and compiled using Keil µVision 5. It is divided into layers:
 
-**Visible Components:**
-- AT89C51 Microcontroller (center board)
-- ESP32 DevKit (purple module)
-- ADS1115 16-bit ADC Module
-- MQ-2 Gas Sensor
-- GP2Y1014 Dust Sensor (in white box)
-- LCD 16x2 Display
-- 8-channel Logic Level Converter (5V ↔ 3.3V)
+1. **Drivers (`drivers/`)**: Low-level hardware interfaces, including a custom software I2C implementation (bit-banged at ~100kHz) to support the AHT10 and ADS1115 modules.
+2. **Core (`core/`)**: High-level application logic. Combines sensor readings, handles fault detection, manages the LCD UI, and formats UART telemetry packets.
+3. **Gateway (`esp32_thingsboard/`)**: Contains the `.ino` sketch for the ESP32 to bridge UART data continuously to the ThingsBoard platform.
 
----
+## Communication Protocol
 
-## 📸 Evidence & Verification | Minh chứng & Kiểm thử
-
-### 1. Hardware Schematic (Proteus Simulation)
-![Schematic Diagram](./docs/schematic.png)
-*Full system schematic including 8051 MCU, ADC0804 interface, and sensor connections.*
-
-### 2. Live Demo Video
-> **🎥 [Watch Video Demo](./docs/8051_Demo.mp4)** (Click to download/view raw file)
-
-*Click to verify system operation: Sensor readings, LCD updates, and Cloud data transmission.*
-
-### 3. Media Coverage
-> 📰 **Featured Article:** [Student FPT Jetking Designs Green Living Solution](https://jetking.fpt.edu.vn/sinh-vien-fpt-jetking-tham-gia-thiet-ke-giai-phap-bao-ve-moi-truong-song-xanh-ngay-tu-ky-1/)
-
-
-### 4. Sample UART Log (Termite/Putty)
-Real-time data packets sent to ESP32 Gateway:
-```text
-[START] PM2.5: 35ug/m3 | GAS: 120ppm | TEMP: 28.5C | HUMID: 65% [CHECKSUM_OK]
-[START] PM2.5: 36ug/m3 | GAS: 122ppm | TEMP: 28.5C | HUMID: 65% [CHECKSUM_OK]
-[START] PM2.5: 34ug/m3 | GAS: 118ppm | TEMP: 28.6C | HUMID: 64% [CHECKSUM_OK]
-...
-[ALERT] GAS LEVEL CRITICAL! TRIGGERING BUZZER...
+The 8051 communicates with the ESP32 over a unidirectional UART link at 9600 baud. The data is transmitted as JSON strings:
+```json
+{"T":28.5,"H":65.0,"P":35.0,"G":120,"E":0}
 ```
 
-### 5. Automated UART Validator
-```bash
-pip install pyserial
-python tools/parse_uart.py COM3   # Windows
-python tools/parse_uart.py /dev/ttyUSB0  # Linux
-```
-Script captures packets for 10s, validates format, checks sensor boundaries, and reports PASS/FAIL.
+## Building
 
----
+1. Open `Smart Room.uvproj` in Keil µVision 5.
+2. Build Output (F7). Hex file will be under `Objects/` directory.
+3. Flash the generated Hex to the 8051 using your preferred programmer.
+4. For the Gateway, flash `esp32_thingsboard.ino` to the ESP32 using the Arduino IDE.
 
-## 🔬 Verification Strategy (Self-Check)
+## Hardware Reference
 
-Corner-case testing performed during development:
+![Circuit Board](docs/circuit_board.jpg)
+*Real hardware implementation on breadboard.*
 
-| Test Scenario | Expected Behavior | Result |
-|---|---|---|
-| **UART Buffer Full** (ESP32 delays WiFi TX) | Circular buffer drops oldest data, no crash | ✅ Verified |
-| **I²C Bus Hang** (Sensor disconnected) | Timeout after 50ms, retry 3x, skip sensor | ✅ Verified |
-| **RAM Overflow** (All buffers active) | Stack stays within 128B limit (95B used) | ✅ Verified |
-| **ADC Saturation** (Sensor max voltage) | ADS1115 returns 0x7FFF, clamp to MAX | ✅ Verified |
-| **Power Glitch** (Brownout 5V→4.2V) | Watchdog resets MCU, ESP32 reconnects | ✅ Verified |
-
-> **Why this matters for Chip Verification:**
-> These corner cases map directly to RTL verification scenarios — buffer overflow detection, protocol timeout handling, and boundary value testing are core skills in IP verification.
-
----
-
-## 🛠️ Hardware Components | Thành phần phần cứng
-
-| Component | Technical Details | Role |
-|-----------|------------------|------|
-| **8051 MCU** | Main controller, 128B RAM | Central processing unit |
-| **ADS1115** | 16-bit High Precision ADC (I2C) | High-res analog readings |
-| **GP2Y1014** | Optical Dust Sensor (PM2.5) | Particulate matter detection |
-| **MQ-2** | Gas/Smoke Sensor (Analog) | Air quality & Safety alert |
-| **AHT10** | Digital Temp & Humid (I2C) | Environment sensing |
-| **LCD 16x2** | Parallel interface (8-bit) | Local UI display |
-| **ESP32** | SoC with Wi-Fi | Gateway to ThingsBoard Cloud |
-
----
-
-## 🔧 Software Architecture | Kiến trúc phần mềm
-
-### 📁 Layer 1: Drivers (`drivers/`)
-Low-level hardware abstraction layer.
-
-| File | Description |
-|------|-------------|
-| `i2c.c/h` | Software I2C Master implementation |
-| `ads1115.c/h` | 16-bit ADC driver (gain, conversion) |
-| `aht10.c/h` | Temperature & Humidity sensor driver |
-| `gp2y1014.c/h` | Dust sensor signal processing |
-| `mq2.c/h` | Gas sensor calibration & reading |
-| `lcd.c/h` | LCD 16x2 character display driver |
-| `delay.c/h` | Precision delay functions |
-
-### 📁 Layer 2: Core (`core/`)
-Business logic and system services.
-
-| File | Description |
-|------|-------------|
-| `uart_protocol.c/h` | Custom packet protocol for ESP32 communication |
-| `display.c/h` | High-level UI management for LCD |
-| `watchdog.c/h` | System reliability and auto-recovery |
-| `types.h` | Common data types definition |
-| `utils.c/h` | Utility functions |
-
-### 📁 Layer 3: Cloud Integration (`esp32_thingsboard/`)
-ESP32 acts as a **smart gateway**:
-- Receives UART packets from 8051
-- Parses data into JSON format
-- Publishes to **ThingsBoard** via MQTT
-
-### 📁 Tools (`tools/`)
-| File | Description |
-|------|-------------|
-| `parse_uart.py` | Automated UART packet validator (pyserial) |
-
----
-
-## 📡 UART Communication Protocol | Giao thức truyền thông
-
-```
-Packet Format: [START] [PM2.5] [GAS] [TEMP] [HUMID] [CHECKSUM] [END]
-
-Baudrate: 9600 bps
-Data bits: 8
-Stop bits: 1
-Parity: None
-
-Sync Method: Interrupt-based asynchronous reception on 8051
-```
-
----
-
-## 💡 Technical Highlights | Điểm nhấn kỹ thuật
-
-**🇬🇧 English:**
-- **Layered Design:** Decoupling hardware drivers from business logic for maintainability.
-- **Interrupt Management:** Timer and UART interrupts for real-time sensor sampling.
-- **Resource Optimization:** Complex system running on only **128 bytes** of DATA RAM.
-- **Register-level Programming:** Direct manipulation of 8051 SFRs for performance.
-- **Cloud Connectivity:** Real-time data visualization on ThingsBoard Dashboard.
-
-**🇻🇳 Tiếng Việt:**
-- **Thiết kế phân lớp:** Tách rời driver phần cứng khỏi logic nghiệp vụ để dễ bảo trì.
-- **Quản lý ngắt:** Ngắt Timer và UART để lấy mẫu cảm biến thời gian thực.
-- **Tối ưu tài nguyên:** Hệ thống phức tạp chạy trên chỉ **128 bytes** RAM.
-- **Lập trình cấp thanh ghi:** Thao tác trực tiếp SFRs của 8051 để tăng hiệu năng.
-- **Kết nối Cloud:** Trực quan hóa dữ liệu thời gian thực trên Dashboard ThingsBoard.
-
----
-
-## 🚧 Technical Challenges & Solutions | Thách thức kỹ thuật
-
-### Challenge 1: Extreme RAM Limitation (128 bytes)
-**Problem:**  
-The AT89C51 has only **128 bytes** of internal DATA RAM. With multiple sensor buffers, I2C variables, UART buffers, and LCD frame buffer, memory was critically constrained.
-
-**Solution:**
-```c
-// Used external XDATA memory for large buffers
-xdata unsigned char uart_tx_buffer[32];  // External RAM
-xdata unsigned char lcd_buffer[32];       // External RAM
-
-// Moved constant data to CODE memory
-code unsigned char sensor_calib_table[] = {0x10, 0x20, ...};
-
-// Optimized stack usage by avoiding deep function nesting
-// Result: RAM usage ~95/128 bytes (74%)
-```
-
----
-
-### Challenge 2: I2C Software Implementation
-**Problem:**  
-AT89C51 lacks hardware I2C peripheral. Had to implement bit-banging I2C while maintaining precise timing for ADS1115 (400kHz Fast-mode I2C) and AHT10.
-
-**Solution:**
-```c
-// Software I2C with precise timing (11.0592 MHz crystal)
-void i2c_start(void) {
-    SDA = 1; SCL = 1; 
-    delay_us(5);
-    SDA = 0;  // SDA falling edge while SCL high
-    delay_us(5);
-    SCL = 0;
-}
-
-// Achieved stable 100kHz I2C (Standard mode)
-// Supports multi-device bus: ADS1115 (0x48) + AHT10 (0x38)
-```
-
----
-
-### Challenge 3: UART Buffer Overflow Prevention
-**Problem:**  
-ESP32 occasionally delayed UART reads during WiFi transmissions, causing 8051's TX buffer to overflow and lose sensor data.
-
-**Solution:**
-```c
-// Implemented circular buffer with overflow detection
-#define UART_BUF_SIZE 16
-xdata unsigned char uart_buffer[UART_BUF_SIZE];
-unsigned char head = 0, tail = 0;
-
-void uart_send(unsigned char c) {
-    unsigned char next_head = (head + 1) & 0x0F;  // Modulo 16
-    if (next_head != tail) {  // Buffer not full
-        uart_buffer[head] = c;
-        head = next_head;
-    }
-    // Else: Drop oldest data (graceful degradation)
-}
-
-// Result: Zero data loss for critical alarm packets
-```
-
----
-
-### Challenge 4: Voltage Level Shifting (5V ↔ 3.3V)
-**Problem:**  
-8051 operates at 5V while ESP32 uses 3.3V logic. Direct connection would damage ESP32's UART RX pin.
-
-**Solution:**
-- Used **8-channel bidirectional logic level converter** (BSS138 MOSFETs)
-- Ensured proper pull-up resistors (4.7kΩ on both sides)
-- Verified signal integrity with oscilloscope
-- **Result:** Stable UART communication at 9600 baud, zero transmission errors
-
----
-
-## 📊 Build & Memory Statistics (Keil µVision 5)
-
-```
-Program Size: data=95.0 xdata=64 code=4826
-  DATA  (Internal RAM) :  95 / 128 bytes  (74.2%) ← Tight!
-  XDATA (External RAM) :  64 bytes (UART + LCD buffers)
-  CODE  (Flash ROM)    : 4826 bytes
-```
-
-| Resource | Usage | Limit | Utilization |
-|----------|-------|-------|-------------|
-| DATA RAM | 95 B | 128 B | **74.2%** (critical!) |
-| XDATA | 64 B | 256 B | 25% |
-| CODE | 4.8 KB | 8 KB | 59% |
-
-> **I²C Timing (measured via bit-bang):** SCL frequency ≈ 95 kHz (target: 100 kHz Standard Mode). Achieved by `delay_us(5)` calibrated for 11.0592 MHz crystal.
-
----
-
-## 🔮 Future Work / Chip Verification Roadmap
-
-This firmware project demonstrates **hardware-intimate programming**. Planned enhancements toward chip verification:
-
-| Phase | Task | Output |
-|-------|------|--------|
-| **Phase 1** (Current) | 8051 bare-metal firmware + ESP32 gateway | ✅ Working prototype with cloud dashboard |
-| **Phase 2** (Planned) | Verilog model of ADS1115 ADC (I²C slave) | RTL simulation of I²C protocol |
-| **Phase 3** (Planned) | cocotb testbench reusing C driver test vectors | Co-simulation (Python ↔ Verilog) |
-| **Phase 4** (Planned) | SVA for I²C protocol compliance checks | `assert property (@(posedge SCL) SDA stable);` |
-
-> **Connection to Chip Design:** The I²C bit-banging driver in this project is the *software equivalent* of an I²C Master IP Core. Understanding timing at this level directly translates to verifying I²C RTL blocks.
-
-**Target CV Statement:**
-*"Implemented 8051-based IoT firmware with layered architecture (Drivers→Core→Cloud). Developed Software I²C (bit-bang) with 95kHz timing, optimized for 128B RAM constraint. Produced hardware prototype with live cloud dashboard and automated UART validation."*
-
----
-
-## 🚀 How to Build | Cách build
-
-1. Open **Keil uVision 5**
-2. Open project file (`*.uvproj`)
-3. Build project (**F7**)
-4. Flash to 8051 board
-
----
-
-## 👨‍💻 Author | Tác giả
-
-**Bì Duy Tân**
-- 🎓 FPT Jetking (Chip Design Technology) - **Electronics: 96/100, Digital Logic: 93/100**
-- 🎯 Embedded Firmware Engineer @ FPT Semiconductor (Target)
-- 📧 duytan2903@gmail.com
-- 🔗 [LinkedIn](https://www.linkedin.com/in/bi-duy-tan-)
-- 💻 [GitHub](https://github.com/duytan1412)
-
----
-
-## 📝 License
-
-MIT License - Free to use for learning purposes.
+## License
+MIT License.
