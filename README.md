@@ -3,6 +3,20 @@
 A firmware project that demonstrates low-level hardware-software interfacing and physical-layer logic implementation using an 8051 microcontroller. This project showcases the ability to manage peripheral communication (I2C, UART) under extreme resource constraints.
 
 The system gathers data from analog/digital sensors, processes it under severe memory constraints (128B RAM), and implements bit-banged I2C logic to interface with multiple slave devices. This highlights a deep understanding of protocol timing and signal levels essential for Design Verification.
+ 
+ ---
+ 
+ ## 🏗️ Kiến trúc hệ thống (System Architecture)
+ - **Physical Layer (Phần cứng)**: AT89C51 giao tiếp với cảm biến AHT10 (I2C) và MQ-2 (Analog).
+ - **Firmware Logic**: Tối ưu hóa trên bộ nhớ RAM cực thấp (128 Bytes), tự viết driver I2C bằng phần mềm (Bit-banging).
+ - **Gateway Layer**: ESP32 đóng vai trò cầu nối UART-to-MQTT để đưa dữ liệu lên Cloud.
+ 
+ ## 🛠️ Hướng dẫn xây dựng và chạy (Run Guidance)
+ 1. **Biên dịch**: Sử dụng Keil µVision 5 để biên dịch code C cho 8051.
+ 2. **Nạp Firmware**: Sử dụng công cụ nạp (như STC-ISP) cho 8051 và Arduino IDE cho ESP32.
+ 3. **Kiểm tra**: Dữ liệu sẽ hiển thị trên LCD 16x2 và web dashboard của ThingsBoard.
+ 
+ ---
 
 ## Architecture
 
