@@ -6,15 +6,15 @@ The system gathers data from analog/digital sensors, processes it under severe m
  
  ---
  
- ## 🏗️ Kiến trúc hệ thống (System Architecture)
- - **Physical Layer (Phần cứng)**: AT89C51 giao tiếp với cảm biến AHT10 (I2C) và MQ-2 (Analog).
- - **Firmware Logic**: Tối ưu hóa trên bộ nhớ RAM cực thấp (128 Bytes), tự viết driver I2C bằng phần mềm (Bit-banging).
- - **Gateway Layer**: ESP32 đóng vai trò cầu nối UART-to-MQTT để đưa dữ liệu lên Cloud.
+ ## 🏗️ System Architecture
+ - **Hardware Layer**: AT89C51 interfacing with AHT10 (I2C) and MQ-2 (Analog) sensors.
+ - **Firmware Logic**: Highly optimized memory management for ultra-low resource environments (128 Bytes RAM), featuring a custom software-based I2C (Bit-banging) driver.
+ - **Gateway Layer**: ESP32 serves as a UART-to-MQTT bridge for Cloud data integration.
  
- ## 🛠️ Hướng dẫn xây dựng và chạy (Run Guidance)
- 1. **Biên dịch**: Sử dụng Keil µVision 5 để biên dịch code C cho 8051.
- 2. **Nạp Firmware**: Sử dụng công cụ nạp (như STC-ISP) cho 8051 và Arduino IDE cho ESP32.
- 3. **Kiểm tra**: Dữ liệu sẽ hiển thị trên LCD 16x2 và web dashboard của ThingsBoard.
+ ## 🛠️ Build & Execution Guidance
+ 1. **Compilation**: Use Keil µVision 5 to compile the C-based firmware for the 8051 MCU.
+ 2. **deployment**: Flash the binary using STC-ISP (for 8051) and the Arduino IDE (for ESP32).
+ 3. **Monitoring**: View real-time data on the 16x2 LCD and the remote ThingsBoard dashboard.
  
  ---
 
