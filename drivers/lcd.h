@@ -54,7 +54,7 @@ void LCD_Print(char *str);
 /*
  * Hàm: LCD_WriteCommand
  * Mô tả: Gửi lệnh đến LCD
- * Tham số: cmd - Mã lệnh (0x01, 0x38, 0x0C, ...)
+ * Tham số: cmd - Mã lệnh (0x01, 0x38, 0x0C,...)
  * Trả về: Không
  * Ví dụ: LCD_WriteCommand(0x01);  // Clear Display
  */

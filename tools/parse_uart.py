@@ -21,7 +21,7 @@ DURATION = 10      # total capture time (seconds)
 MIN_OK   = 3       # minimum valid packets to PASS
 
 def parse_packet(line):
-    """Validate UART packet format: [START] PM2.5: XXug/m3 | GAS: XXXppm | ..."""
+    """Validate UART packet format: [START] PM2.5: XXug/m3 | GAS: XXXppm |..."""
     pattern = r'\[START\]\s*PM2\.5:\s*(\d+)ug/m3\s*\|\s*GAS:\s*(\d+)ppm\s*\|\s*TEMP:\s*([\d.]+)C\s*\|\s*HUMID:\s*(\d+)%'
     match = re.search(pattern, line)
     if match:

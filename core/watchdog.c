@@ -17,7 +17,7 @@
  * QUAN TRỌNG - TÍCH HỢP VỚI DELAY:
  * - Hàm delay_ms() trong delay.c đã tích hợp WDT_Feed()
  * - delay_ms() gọi WDT_Feed() mỗi 10ms trong vòng lặp
- * - Điều này cho phép delay bất kỳ thời gian nào (500ms, 2000ms, ...)
+ * - Điều này cho phép delay bất kỳ thời gian nào (500ms, 2000ms,...)
  *   mà không bị Watchdog reset
  * - Nếu không tích hợp, delay_ms(500) sẽ gây reset sau 16ms!
  * 

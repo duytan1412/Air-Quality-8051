@@ -97,7 +97,7 @@ void UART_SendChar(char c)
     // TI = 1 khi phần cứng đã gửi xong 1 byte
     // Vòng lặp này đảm bảo không ghi đè SBUF trước khi gửi xong
     while (!TI)
-        ;
+       ;
     
     // Xóa cờ TI về 0 để chuẩn bị cho lần gửi tiếp theo
     // Phần cứng không tự xóa TI, phải xóa bằng phần mềm

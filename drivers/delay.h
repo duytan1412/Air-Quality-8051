@@ -38,7 +38,7 @@ void delay_us(unsigned int us);
  *   - Timing phụ thuộc vào tần số thạch anh (11.0592 MHz)
  *   - Hàm blocking
  *   - ĐÃ TÍCH HỢP WDT_Feed() mỗi 10ms => delay dài vẫn an toàn!
- *   - Có thể delay 500ms, 2000ms, ... mà không bị Watchdog reset
+ *   - Có thể delay 500ms, 2000ms,... mà không bị Watchdog reset
  * Ví dụ: delay_ms(500);  // Delay 500 ms - AN TOÀN!
  */
 void delay_ms(unsigned int ms);
