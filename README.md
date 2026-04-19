@@ -79,10 +79,17 @@ The 8051 communicates with the ESP32 over a unidirectional UART link at 9600 bau
 3. Flash the generated Hex to the 8051 using your preferred programmer.
 4. For the Gateway, flash `esp32_thingsboard.ino` to the ESP32 using the Arduino IDE.
 
-## Hardware Reference
+## 🎞️ Visual Demonstration
 
+### Hardware in Action
+[Watch the Demo Video](docs/8051_Demo.mp4)
+*Video shows the 8051 reading sensor data and ESP32 pushing data to the cloud.*
+
+### Real Hardware Implementation
 ![Circuit Board](docs/circuit_board.jpg)
-*Real hardware implementation on breadboard.*
+*Real hardware implementation on breadboard with MQ-2, AHT10 and LCD.*
+
+---
 
 ## License
 MIT License.
