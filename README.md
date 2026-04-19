@@ -1,8 +1,8 @@
-# Air Quality Monitoring System
+# Air Quality Monitoring System (Hardware-Software Interface)
 
-A firmware project that implements environmental monitoring using an 8051 microcontroller as the primary processing unit and an ESP32 as an IoT gateway.
+A firmware project that demonstrates **low-level hardware-software interfacing** and **physical-layer logic implementation** using an 8051 microcontroller. This project showcases the ability to manage peripheral communication (I2C, UART) under extreme resource constraints.
 
-The system gathers data from multiple analog and digital sensors, processes it under severe memory constraints (128B RAM), and formats it into UART packets. The ESP32 parses these packets and forwards them to a ThingsBoard cloud dashboard via MQTT.
+The system gathers data from analog/digital sensors, processes it under severe memory constraints (128B RAM), and implements **bit-banged I2C logic** to interface with multiple slave devices. This highlights a deep understanding of protocol timing and signal levels essential for Design Verification.
 
 ## Architecture
 
