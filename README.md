@@ -6,12 +6,12 @@ The system gathers data from analog/digital sensors, processes it under severe m
  
  ---
  
- ## 🏗️ System Architecture
+ ## System Architecture
  - **Hardware Layer**: AT89C51 interfacing with AHT10 (I2C) and MQ-2 (Analog) sensors.
  - **Firmware Logic**: Highly optimized memory management for ultra-low resource environments (128 Bytes RAM), featuring a custom software-based I2C (Bit-banging) driver.
  - **Gateway Layer**: ESP32 serves as a UART-to-MQTT bridge for Cloud data integration.
  
- ## 🛠️ Build & Execution Guidance
+ ## Build and Execution Guidance
  1. **Compilation**: Use Keil µVision 5 to compile the C-based firmware for the 8051 MCU.
  2. **deployment**: Flash the binary using STC-ISP (for 8051) and the Arduino IDE (for ESP32).
  3. **Monitoring**: View real-time data on the 16x2 LCD and the remote ThingsBoard dashboard.
@@ -93,7 +93,7 @@ The 8051 communicates with the ESP32 over a unidirectional UART link at 9600 bau
 3. Flash the generated Hex to the 8051 using your preferred programmer.
 4. For the Gateway, flash `esp32_thingsboard.ino` to the ESP32 using the Arduino IDE.
 
-## 🎞️ Visual Demonstration
+## Visual Demonstration
 
 ### Hardware in Action
 [Watch the Demo Video](docs/8051_Demo.mp4)
